@@ -13,17 +13,17 @@ const addDoctor = async (req, res) => {
 
         //checking for all data to add doctor
         if (!name || !email || !password || !imageFile || !speciality || !degree || !experience || !about || !fees || !address) {
-            return res.status(400).json({ message: "All fields are required" });
+            return res.json({ message: "All fields are required" });
         }
 
         // validating email format
         if (!validator.isEmail(email)) {
-            return res.status(400).json({ message: "Invalid email format" });
+            return res.json({ message: "Invalid email format" });
         }
 
         // validating strong password
         if(password.length < 8){
-            return res.status(400).json({ message: "Password must be at least 8 characters long" });
+            return res.json({ message: "Password must be at least 8 characters long" });
         }
 
         // hashing doctor's password
@@ -57,7 +57,7 @@ const addDoctor = async (req, res) => {
     }
     catch(error) {
         console.error("Error adding doctor:", error);
-        res.status(500).json({ message: error.message });
+        res.json({ message: error.message });
     }
 }
 
@@ -66,19 +66,20 @@ const loginAdmin = async (req, res) => {
     try{
 
         const { email, password } = req.body;
+        // console.log(email, password);
 
         if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             const token = jwt.sign(email+password, process.env.JWT_SECRET);
             res.json({ success: true, token });
         }
         else{
-            return res.status(401).json({ success: false, message: "Invalid email or password" });
+            return res.json({ success:false, message: "Invalid credentials" });
         }
 
     }
     catch(error) {
         console.error("Error logging in admin:", error);
-        res.status(500).json({ message: error.message });
+        res.json({ message: error.message });
     }
 }
 
