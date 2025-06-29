@@ -149,7 +149,7 @@ const AddDoctor = () => {
             </div>
 
             <div className='flex flex-col gap-1'>
-              <p>Address</p>a
+              <p>Address</p>
               <input onChange={(e) => setAddress1(e.target.value)} value={address1} className='border rounded px-3 py-2' type='text' placeholder='address1' required/>
               <input onChange={(e) => setAddress2(e.target.value)} value={address2} className='border rounded px-3 py-2' type='text' placeholder='address2' required/>
             </div>

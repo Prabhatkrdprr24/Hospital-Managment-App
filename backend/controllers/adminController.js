@@ -66,7 +66,7 @@ const loginAdmin = async (req, res) => {
     try{
 
         const { email, password } = req.body;
-        // console.log(email, password);
+        console.log(email, password);
 
         if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             const token = jwt.sign(email+password, process.env.JWT_SECRET);
@@ -83,4 +83,19 @@ const loginAdmin = async (req, res) => {
     }
 }
 
-export { addDoctor, loginAdmin };
+// API to get all doctors list for admin panel
+const allDoctors = async (req, res) => {
+    try{
+
+        const doctors = await doctorModel.find({}).select('-password');
+        res.json({ success: true, doctors });
+
+    }
+    catch(error) {
+        console.log(error);
+        res.json({ message: error.message });
+    }
+}
+    
+
+export { addDoctor, loginAdmin, allDoctors };
