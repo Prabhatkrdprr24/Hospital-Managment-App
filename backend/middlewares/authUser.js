@@ -6,6 +6,7 @@ const authUser = (req, res, next) => {
     try{
 
         const { token } = req.headers;
+        // console.log("Token received in authUser middleware:", token);
         if (!token) {
             return res.json({ message: "Not authorized, login again" });
         }

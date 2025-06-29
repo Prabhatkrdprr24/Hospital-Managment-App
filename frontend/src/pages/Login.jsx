@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 
 const Login = () => {
 
+  // console.log("Login page rendered");
   const {backendUrl, setToken, token} = useContext(AppContext);
   const navigate = useNavigate();
 
@@ -64,7 +65,9 @@ const Login = () => {
   }
 
   useEffect(() => {
-    navigate('/');
+    if(token){
+      navigate('/');
+    }
   }, [token]);
 
   return (
@@ -76,7 +79,7 @@ const Login = () => {
         {
           state === 'Sign Up' && <div className='w-full'>
           <p>Full Name</p>
-          <input className='border border-zinc-300 rounded w-full p-2 mt-1' type='text' onChange={(e) => setName(e.target.name)} value={name}/>
+          <input className='border border-zinc-300 rounded w-full p-2 mt-1' type='text' onChange={(e) => setName(e.target.value)} value={name}/>
         </div>
         }
 
