@@ -271,7 +271,7 @@ const paymentRazorpay = async (req, res) => {
         const { appointmentId } = req.body;
         // console.log("Appointment ID:", appointmentId);
         const appointmentData = await appointmentModel.findById(appointmentId);
-        console.log("Appointment Data:", appointmentData);
+        // console.log("Appointment Data:", appointmentData);
 
         if(!appointmentData || appointmentData.cancelled){
             return res.json({success: false, message: "Appointment not found or cancelled"});
