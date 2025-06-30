@@ -65,4 +65,77 @@ const loginDoctor = async (req, res) => {
 
 }
 
-export {changeAvailability, doctorList, loginDoctor};
+//API to get doctor appointments for doctor panel
+const appointmentsDoctor = async (req, res) => {
+
+    try{
+
+        // console.log("Fetching appointments for doctor... backend");
+        const docId = req.docId;
+        // console.log("Doctor ID:", docId);
+
+        const appointments = await appointmentModel.find({ docId});
+
+        res.json({success: true, appointments});
+
+    }
+    catch(error){
+        console.error(error);
+        res.json({success: false, message: error.message});
+    }
+
+}
+    
+//API to mark appointment as completed for doctor panel
+const appointmentComplete = async (req, res) => {
+
+    try{
+
+        const {appointmentId} = req.body;
+        const docId = req.docId;
+
+        const appointmentData = await appointmentModel.findById(appointmentId);
+
+        if(appointmentData && appointmentData.docId === docId){
+            await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true });
+            res.json({success: true, message: 'Appointment marked as completed'});
+        }
+        else{
+            return res.json({success: false, message: 'Mark appointment failed'});
+        }
+
+    }
+    catch(error){
+        console.error(error);
+        res.json({success: false, message: error.message});
+    }
+
+}
+
+//API to mark appointment as cancelled for doctor panel
+const appointmentCancel = async (req, res) => {
+
+    try{
+
+        const {appointmentId} = req.body;
+        const docId = req.docId;
+
+        const appointmentData = await appointmentModel.findById(appointmentId);
+
+        if(appointmentData && appointmentData.docId === docId){
+            await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
+            res.json({success: true, message: 'Appointment marked as completed'});
+        }
+        else{
+            return res.json({success: false, message: 'Cancellation failed'});
+        }
+
+    }
+    catch(error){
+        console.error(error);
+        res.json({success: false, message: error.message});
+    }
+
+}
+
+export {changeAvailability, doctorList, loginDoctor, appointmentsDoctor, appointmentComplete, appointmentCancel};
