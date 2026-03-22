@@ -81,8 +81,9 @@ const loginUser = async (req, res) => {
             user.otpExpiry = Date.now() + 10 * 60 * 1000;
             await user.save();
 
-            const emailTemplatePath = path.join(process.cwd(), 'EmailHtml', 'email-template.html');
+            const emailTemplatePath = path.join(process.cwd(), 'EmailHtml', 'email_template.html');
             if (!fs.existsSync(emailTemplatePath)) {
+                console.log(`Email template file not found at: ${emailTemplatePath}`);
                 throw new Error(`Email template file not found at: ${emailTemplatePath}`);
             }
             let html = fs.readFileSync(emailTemplatePath, "utf8");
