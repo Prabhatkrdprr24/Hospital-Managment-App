@@ -6,6 +6,8 @@ import { updateProfile } from '../controllers/userController.js';
 import { verifyEmailOtp } from '../controllers/userController.js';
 import { resendEmailOtp } from '../controllers/userController.js';
 import { resetPassword } from '../controllers/userController.js';
+import { setNewPassword } from '../controllers/userController.js';
+import { verifyResetPassword } from '../controllers/userController.js';
 
 const userRouter = express.Router();
 
@@ -20,6 +22,8 @@ userRouter.post('/payment-razorpay', authUser, paymentRazorpay);
 userRouter.post('/verifyRazorpay', authUser, verifyRazorpay);
 userRouter.post('/verify-otp', authUser, verifyEmailOtp);
 userRouter.get('/resend-otp', authUser, resendEmailOtp);
-userRouter.post('/reset-password', authUser, resetPassword);
+userRouter.post('/password-reset', resetPassword);
+userRouter.post('/verify-reset-otp', verifyResetPassword);
+userRouter.post('/set-new-password', setNewPassword)
 
 export default userRouter;

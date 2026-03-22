@@ -1,16 +1,51 @@
 import React, { useState } from "react";
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function PasswordReset() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const navigate = useNavigate();
+  const { backendUrl } = useContext(AppContext);
+
+  const handleResetSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
+    try {
+        const { data } = await axios.post(backendUrl + '/api/user/password-reset', {
+            email
+        });
+        console.log("data in passwordreset", data);
+        // setMessage("Password reset email sent successfully.");
+        if(!data.success){
+            setMessage(data.message || "Error sending password reset email.");
+        }
+
+        if(data.success){
+            toast.success("Password reset email sent successfully");
+            localStorage.setItem("email", email);
+            setLoading(false);
+            navigate('/verify-reset-otp',{
+                state: {
+                    email: email
+                }
+            })
+        }
+        
+    }
+    catch (error) {
+        console.error("Error sending password reset email:", error);
+        setMessage("An error occurred. Please try again.");
+        setLoading(false);
+    }
     
-    setLoading(false);
+    
   };
 
   return (
@@ -24,7 +59,7 @@ export default function PasswordReset() {
           Enter your email to receive a password reset link
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleResetSubmit} className="space-y-4">
           <input
             type="email"
             placeholder="Enter your email"
@@ -39,7 +74,7 @@ export default function PasswordReset() {
             disabled={loading}
             className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
           >
-            {loading ? "Sending..." : "Send Reset Link"}
+            {loading ? "Sending..." : "Reset Password"}
           </button>
         </form>
 

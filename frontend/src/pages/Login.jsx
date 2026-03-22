@@ -109,7 +109,23 @@ const Login = () => {
           )
         }
 
+        {
+          state !== 'Sign Up' && (
+            <div className='w-full text-center'>
+              <span
+                onClick={() => navigate('/reset-password')}
+                className='text-primary text-sm cursor-pointer'
+              >
+                Forgot Password?
+              </span>
+            </div>
+          )
+        }
+
       </div>
+
+        
+
     </form>
   )
 }

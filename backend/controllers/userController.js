@@ -149,7 +149,78 @@ export const resendEmailOtp = async (req, res) => {
 }
 
 export const resetPassword = async (req, res) => {
+    try{
+        const { email } = req.body;
+        // console.log("Password reset requested for email:", email);
+        const userData = await userModel.findOne({email});
 
+        if(!userData){
+            return res.json({success: false, message: "User not found"});
+        }
+
+        const message = "Your OTP for password reset is:";
+        const html = await generateOTPEmail(userData, email, message);
+        await sendEmailOtp(email, html);
+
+        return res.json({success: true, message: "Password reset OTP sent to email successfully"});
+    }
+    catch(error){
+        console.error(error);
+        return res.json({success: false, message: error.message});
+    }
+}
+
+export const verifyResetPassword = async (req, res) => {
+    try{
+        const { email, otp } = req.body;
+        const user = await userModel.findOne({ email });
+
+        if(!user){
+            return res.json({success: false, message: "User not found"})
+        }
+
+        if(user.otp !== otp){
+            console.log("Invalid OTP provided for email:", email, otp);
+
+            return res.json({success: false, message: "Invalid OTP"});
+        }
+
+        if(user.otpExpiry < Date.now()){
+            return res.json({success: false, message: "OTP expired"});
+        }
+
+        user.otp = null;
+        user.otpExpiry = null;
+        await user.save();
+        return res.json({success: true, data: user, message: "OTP verified successfully"});
+
+    }
+    catch(error){
+        console.log(error.message)
+        return res.json({success: false, message: "Invalid OTP"})
+    }
+}
+
+export const setNewPassword = async (req, res) => {
+    try{
+        const {email, password} = req.body;
+        const user = await userModel.findOne({ email });
+
+        if(!user){
+            return res.json({success: false, message: "User not found"});
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        user.password = hashedPassword;
+        await user.save();
+        return res.json({success: true, message: "Password reset successfully"});
+
+    }
+    catch(error){
+        console.log(error.message);
+        return res.json({success: false, message: "Something went wrong"});
+    }
 }
 
 //API to get user profile data

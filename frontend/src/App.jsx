@@ -13,6 +13,10 @@ import Footer from './components/Footer'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import VerifyOtp from './pages/VerifyOtp'
+import PasswordReset from './pages/PasswordReset'
+import PasswordResetOtp from './pages/PasswordResetOtp';
+import NewPassword from './pages/NewPassword'
+
 
 const App = () => {
   return (
@@ -31,6 +35,9 @@ const App = () => {
         <Route path='/my-appointments' element={<MyAppointments />} />
         <Route path='/appointment/:docId' element={<Appointment />} />
         <Route path='/verify-otp' element={<VerifyOtp />} />
+        <Route path='/reset-password' element={<PasswordReset />} />
+        <Route path='/verify-reset-otp' element={<PasswordResetOtp />} />
+        <Route path='/new-password' element={<NewPassword />} />
       </Routes>
       <Footer />
     </div>

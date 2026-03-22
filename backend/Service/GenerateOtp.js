@@ -1,7 +1,7 @@
 import { getEmailTemplate } from '../EmailTemplate/email_template.js';
 import { generateOTP } from './SendEmailOtp.js';
 
-const generateOTPEmail = async (user, email) => {
+const generateOTPEmail = async (user, email, message) => {
     try{
         //generate new OTP, save in user model and send to user email
         const otp = generateOTP();
@@ -13,7 +13,7 @@ const generateOTPEmail = async (user, email) => {
         const html = getEmailTemplate({
             title: "Your OTP for Prescripto",
             email,
-            message: "Your OTP for email verification is:",
+            message: message || "Your OTP for email verification is:",
             otp,
             footer: "Valid for 10 minutes"
         });
