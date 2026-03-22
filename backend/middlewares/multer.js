@@ -5,7 +5,7 @@ const storage = multer.diskStorage({
     //     callback(null, 'uploads/'); // Make sure this folder exists
     // },
     filename: function (req, file, callback){
-        callback(null, file.originalname);
+        callback(null, file.originalname);  //callback is a function used to return the result to Multer
     }
 });
 
