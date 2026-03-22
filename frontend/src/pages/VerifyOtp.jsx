@@ -80,9 +80,9 @@ const VerifyOtp = () => {
 
             if (data.success) {
                 toast.success("OTP verified successfully");
-                localStorage.setItem('token', passedToken);
+                localStorage.setItem('token', pendingToken);
                 localStorage.removeItem('pendingToken');
-                setToken(passedToken);
+                setToken(pendingToken);
                 setUserData(data.data);
                 navigate('/');
             } else {
