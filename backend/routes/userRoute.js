@@ -3,6 +3,7 @@ import { bookAppointment, cancelAppointment, getProfile, listAppointment, loginU
 import authUser from '../middlewares/authUser.js';
 import upload from '../middlewares/multer.js';
 import { updateProfile } from '../controllers/userController.js';
+import { verifyEmailOtp } from '../controllers/userController.js';
 
 const userRouter = express.Router();
 
@@ -15,6 +16,7 @@ userRouter.get('/appointments', authUser, listAppointment);
 userRouter.post('/cancel-appointment', authUser, cancelAppointment);
 userRouter.post('/payment-razorpay', authUser, paymentRazorpay); 
 userRouter.post('/verifyRazorpay', authUser, verifyRazorpay);
+userRouter.post('/verify-otp', authUser, verifyEmailOtp);
 
 
 export default userRouter;

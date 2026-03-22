@@ -12,6 +12,7 @@ import Appointment from './pages/Appointment'
 import Footer from './components/Footer'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import VerifyOtp from './pages/VerifyOtp'
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
         <Route path='/my-profile' element={<MyProfile />} />
         <Route path='/my-appointments' element={<MyAppointments />} />
         <Route path='/appointment/:docId' element={<Appointment />} />
+        <Route path='/verify-otp' element={<VerifyOtp />} />
       </Routes>
       <Footer />
     </div>

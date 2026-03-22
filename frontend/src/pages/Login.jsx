@@ -35,6 +35,7 @@ const Login = () => {
           toast.success("Account created successfully");
           localStorage.setItem('token', data.token);
           setToken(data.token);
+          navigate("/")
         }
         else{
           toast.error(data.message);
@@ -47,9 +48,14 @@ const Login = () => {
         });
 
         if(data.success){
-          setToken(data.token);
+          // setToken(data.token);
           localStorage.setItem('token', data.token);
-          toast.success("Logged in successfully");
+          navigate("/verify-otp", {
+            state: {
+              token: data.token
+            }
+          })
+          toast.success("OTP sent successfully");
         }
         else{
           toast.error(data.message);
@@ -64,11 +70,11 @@ const Login = () => {
     
   }
 
-  useEffect(() => {
-    if(token){
-      navigate('/');
-    }
-  }, [token]);
+  // useEffect(() => {
+  //   if(token){
+  //     navigate('/');
+  //   }
+  // }, [token]);
 
   return (
     <form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center'>

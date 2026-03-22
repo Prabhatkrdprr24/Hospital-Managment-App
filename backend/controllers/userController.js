@@ -6,6 +6,12 @@ import {v2 as cloudinary} from 'cloudinary';
 import doctorModel from '../models/doctorModel.js';
 import appointmentModel from '../models/appointmentModel.js';
 import razorpay from 'razorpay';
+import { sendEmailOtp } from '../Service/SendEmailOtp.js';
+import { generateOTP } from '../Service/SendEmailOtp.js';
+import fs from 'fs';
+import path from 'path';
+import { rootDir } from '../config/path.js';
+
 
 //API to register a new user
 const registerUser = async (req, res) => {
@@ -68,8 +74,32 @@ const loginUser = async (req, res) => {
 
         const isMatch = await bcrypt.compare(password, user.password);
         if(isMatch){
-            const token = jwt.sign({id: user._id}, process.env.JWT_SECRET);
-            res.json({success: true, token});
+            const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET);
+
+            //generate OTP, save in user model and send to user email
+            const otp = generateOTP();
+            user.otp = otp;
+            user.otpExpiry = Date.now() + 10 * 60 * 1000;
+            await user.save();
+
+            const emailTemplatePath = path.join(rootDir, 'EmailHtml', 'email-template.html');
+            let html = fs.readFileSync(emailTemplatePath, "utf8");
+            html = html
+                    .replace("{{title}}", "Your OTP for Prescripto")
+                    .replace("{{email}}", email)
+                    .replace("{{message}}", "Your OTP for email verification is:")
+                    .replace("{{otp}}", otp)
+                    .replace("{{footer}}", "If you did not request this, you can safely ignore this email.");
+
+
+            await sendEmailOtp(email, html);
+
+            // Sending response with token and success message
+            return res.json({
+                success: true, 
+                token,
+                message: "OTP sent to email successfully"
+            });
         }
         else{
             return res.json({success: false, message: "Invalid credentials"});
@@ -83,14 +113,54 @@ const loginUser = async (req, res) => {
 
 }
 
+export const verifyEmailOtp = async (req, res) => {
+    try{
+        const { otp } = req.body;
+        const email = req.email;
+        console.log("Verifying OTP for email:", email);
+        const userData = await userModel.findOne({email});
+
+        if(!userData){
+            return res.json({success: false, message: "User not found"});
+        }
+
+        if(userData.otp !== otp){
+            return res.json({success: false, message: "Invalid OTP"});
+        }
+
+        if(userData.otpExpiry < Date.now()){
+            return res.json({success: false, message: "OTP expired"});
+        }
+
+        userData.otp = null;
+        userData.otpExpiry = null;
+        await userData.save();
+        return res.json({success: true, data: userData, message: "OTP verified successfully"});
+    }
+    catch(error){
+        console.error(error);
+        res.json({success: false, message: error.message});
+    }
+}
+
 //API to get user profile data
 const getProfile = async (req, res) => {
 
     try{
 
-        const { userId } = req;
+        const { userId, email } = req;
         console.log(req.body);
-        const userData = await userModel.findById(userId).select('-password');
+        let userData = null;
+
+        if (userId) {
+            userData = await userModel.findById(userId).select('-password');
+        } else if (email) {
+            userData = await userModel.findOne({ email }).select('-password');
+        }
+
+        if (!userData) {
+            return res.json({ success: false, message: 'User not found' });
+        }
 
         res.json({success: true, userData});
 
@@ -257,15 +327,25 @@ const cancelAppointment = async (req, res) => {
 
 }
 
-const razorpayInstance = new razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+const getRazorpayInstance = () => {
+    const key_id = process.env.RAZORPAY_KEY_ID;
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!key_id || !key_secret) {
+        throw new Error('Razorpay credentials are missing in environment variables');
+    }
+
+    return new razorpay({
+        key_id,
+        key_secret
+    });
+};
 
 //API to make payment of appointment using razorpay
 const paymentRazorpay = async (req, res) => {
 
     try{
+        const razorpayInstance = getRazorpayInstance();
 
         // console.log("Processing payment... backend");
         const { appointmentId } = req.body;
@@ -302,6 +382,7 @@ const paymentRazorpay = async (req, res) => {
 const verifyRazorpay = async (req, res) => {
 
     try{
+        const razorpayInstance = getRazorpayInstance();
 
         const { razorpay_order_id } = req.body;
         console.log("Verifying Razorpay payment for order ID:", req.body);
