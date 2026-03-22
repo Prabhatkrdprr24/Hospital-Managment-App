@@ -9,7 +9,7 @@ import razorpay from 'razorpay';
 import { sendEmailOtp } from '../Service/SendEmailOtp.js';
 import { generateOTP } from '../Service/SendEmailOtp.js';
 import { getEmailTemplate } from '../EmailTemplate/email_template.js';
-
+import generateOTPEmail from '../Service/GenerateOtp.js';
 
 //API to register a new user
 const registerUser = async (req, res) => {
@@ -74,20 +74,7 @@ const loginUser = async (req, res) => {
         if(isMatch){
             const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET);
 
-            //generate OTP, save in user model and send to user email
-            const otp = generateOTP();
-            user.otp = otp;
-            user.otpExpiry = Date.now() + 10 * 60 * 1000;
-            await user.save();
-
-            //read email template
-            const html = getEmailTemplate({
-                title: "Your OTP for Prescripto",
-                email,
-                message: "Your OTP for email verification is:",
-                otp,
-                footer: "Valid for 10 minutes"
-            });
+            const html = await generateOTPEmail(user, email);
 
             await sendEmailOtp(email, html);
 
@@ -138,6 +125,31 @@ export const verifyEmailOtp = async (req, res) => {
         console.error(error);
         res.json({success: false, message: error.message});
     }
+}
+
+export const resendEmailOtp = async (req, res) => {
+    try{
+        const email = req.email;
+        const userData = await userModel.findOne({email});
+
+        if(!userData){
+            return res.json({success: false, message: "User not found"});
+        }
+
+        
+        const html = await generateOTPEmail(userData, email);
+        await sendEmailOtp(email, html);
+
+        return res.json({success: true, message: "OTP resent to email successfully"});
+    }
+    catch(error){
+        console.error(error);
+        res.json({success: false, message: error.message});
+    }
+}
+
+export const resetPassword = async (req, res) => {
+
 }
 
 //API to get user profile data

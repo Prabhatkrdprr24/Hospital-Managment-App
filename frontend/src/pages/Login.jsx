@@ -49,10 +49,10 @@ const Login = () => {
 
         if(data.success){
           // setToken(data.token);
-          localStorage.setItem('token', data.token);
+          localStorage.setItem('pendingToken', data.token);
           navigate("/verify-otp", {
             state: {
-              token: data.token
+              pendingToken: data.token
             }
           })
           toast.success("OTP sent successfully");
