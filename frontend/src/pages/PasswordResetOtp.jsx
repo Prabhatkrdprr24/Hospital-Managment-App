@@ -97,13 +97,13 @@ export default function PasswordResetOtp() {
   };
 
   // 🔄 Resend OTP
-  const handleResendOtp = () => {
-    setTimeLeft(300);
-    setResendTimeLeft(60);
-    setOtp(["", "", "", "", "", ""]);
-    inputsRef.current[0].focus();
+//   const handleResendOtp = () => {
+//     setTimeLeft(300);
+//     setResendTimeLeft(60);
+//     setOtp(["", "", "", "", "", ""]);
+//     inputsRef.current[0].focus();
 
-  };
+//   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
@@ -149,7 +149,7 @@ export default function PasswordResetOtp() {
           Verify OTP
         </button>
 
-        {/* Resend */}
+        {/* Resend
         {resendTimeLeft > 0 ? (
           <button
             className="mt-3 text-gray-400 cursor-not-allowed"
@@ -164,7 +164,7 @@ export default function PasswordResetOtp() {
           >
             Resend OTP
           </button>
-        )}
+        )} */}
 
       </div>
     </div>
