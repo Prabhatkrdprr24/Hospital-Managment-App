@@ -8,8 +8,7 @@ import appointmentModel from '../models/appointmentModel.js';
 import razorpay from 'razorpay';
 import { sendEmailOtp } from '../Service/SendEmailOtp.js';
 import { generateOTP } from '../Service/SendEmailOtp.js';
-import fs from 'fs';
-import path from 'path';
+import { getEmailTemplate } from '../EmailTemplate/email_template.js';
 
 
 //API to register a new user
@@ -81,19 +80,14 @@ const loginUser = async (req, res) => {
             user.otpExpiry = Date.now() + 10 * 60 * 1000;
             await user.save();
 
-            const emailTemplatePath = path.join(process.cwd(), "/EmailHtml/email-template.html");
-            if (!fs.existsSync(emailTemplatePath)) {
-                console.log(`Email template file not found at: ${emailTemplatePath}`);
-                throw new Error(`Email template file not found at: ${emailTemplatePath}`);
-            }
-            let html = fs.readFileSync(emailTemplatePath, "utf8");
-            html = html
-                    .replace("{{title}}", "Your OTP for Prescripto")
-                    .replace("{{email}}", email)
-                    .replace("{{message}}", "Your OTP for email verification is:")
-                    .replace("{{otp}}", otp)
-                    .replace("{{footer}}", "If you did not request this, you can safely ignore this email.");
-
+            //read email template
+            const html = getEmailTemplate({
+                title: "Your OTP for Prescripto",
+                email,
+                message: "Your OTP for email verification is:",
+                otp,
+                footer: "Valid for 10 minutes"
+            });
 
             await sendEmailOtp(email, html);
 
