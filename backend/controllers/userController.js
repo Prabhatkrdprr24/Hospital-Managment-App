@@ -82,7 +82,10 @@ const loginUser = async (req, res) => {
             user.otpExpiry = Date.now() + 10 * 60 * 1000;
             await user.save();
 
-            const emailTemplatePath = path.join(rootDir, 'EmailHtml', 'email-template.html');
+            const emailTemplatePath = path.join(process.cwd(), 'EmailHtml', 'email-template.html');
+            if (!fs.existsSync(emailTemplatePath)) {
+                throw new Error(`Email template file not found at: ${emailTemplatePath}`);
+            }
             let html = fs.readFileSync(emailTemplatePath, "utf8");
             html = html
                     .replace("{{title}}", "Your OTP for Prescripto")
