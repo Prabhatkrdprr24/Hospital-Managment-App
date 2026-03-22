@@ -10,7 +10,6 @@ import { sendEmailOtp } from '../Service/SendEmailOtp.js';
 import { generateOTP } from '../Service/SendEmailOtp.js';
 import fs from 'fs';
 import path from 'path';
-import { rootDir } from '../config/path.js';
 
 
 //API to register a new user
