@@ -10,6 +10,9 @@ import { sendEmailOtp } from '../Service/SendEmailOtp.js';
 import { generateOTP } from '../Service/SendEmailOtp.js';
 import { getEmailTemplate } from '../EmailTemplate/email_template.js';
 import generateOTPEmail from '../Service/GenerateOtp.js';
+import { getAppointmentTemplate } from '../EmailTemplate/appointment_detail.js';
+
+
 
 //API to register a new user
 const registerUser = async (req, res) => {
@@ -339,6 +342,17 @@ const bookAppointment = async (req, res) => {
 
         //save new slots data in docData
         await doctorModel.findByIdAndUpdate(docId, {slots_booked});
+
+        const appointmentDetails = {
+            doctorName: docData.name,
+            doctorEmail: docData.email,
+            slotDate,
+            slotTime,
+            fees: docData.fees
+        }
+        
+        const html = getAppointmentTemplate(userData.email, appointmentDetails);
+        await sendEmailOtp(userData.email, html, "Your appointment has been booked successfully");
 
         res.json({success: true, message: "Appointment booked"});
 
